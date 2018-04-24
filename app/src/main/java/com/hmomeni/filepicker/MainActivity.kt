@@ -21,8 +21,9 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             1234 -> {
-                if (resultCode == Activity.RESULT_OK)
-                    GlideApp.with(this).load(data!!.getStringExtra("file_path")).into(imageView)
+                if (resultCode == Activity.RESULT_OK) {
+
+                }
             }
         }
     }

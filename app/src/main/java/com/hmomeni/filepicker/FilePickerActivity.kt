@@ -1,6 +1,8 @@
 package com.hmomeni.filepicker
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -17,6 +19,7 @@ import java.io.File
 import java.io.FileFilter
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.ArrayList
 
 class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -55,6 +58,11 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
         typeSpinner.onItemSelectedListener = this
+
+        selectBtn.setOnClickListener {
+            setResult(Activity.RESULT_OK, Intent().putStringArrayListExtra("file_paths", ArrayList(fpItems.filter { it.selected }.map { it.path })))
+            finish()
+        }
     }
 
     fun applyMediaType(mediaType: Int) {
@@ -120,8 +128,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
                 Toast.makeText(this, "You can't pick mor than $maxItems", Toast.LENGTH_SHORT).show()
             }
         }
-//        setResult(Activity.RESULT_OK, Intent().putExtra("file_path", fpItems[position].path))
-//        finish()
+
     }
 
     private fun isAllowToPickMore() = fpItems.filter { it.selected }.size < maxItems

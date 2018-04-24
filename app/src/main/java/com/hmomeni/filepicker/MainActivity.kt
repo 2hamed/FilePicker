@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         browseBtn.setOnClickListener {
-            startActivityForResult(Intent(this, FilePickerActivity::class.java).putExtra("media_type", 1), 1234)
+            startActivityForResult(Intent(this, FilePickerActivity::class.java).putExtra("max_items", 3), 1234)
         }
 
     }

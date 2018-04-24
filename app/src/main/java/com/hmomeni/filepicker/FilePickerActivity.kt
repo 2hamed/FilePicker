@@ -1,8 +1,6 @@
 package com.hmomeni.filepicker
 
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -13,6 +11,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_file_picker.*
 import java.io.File
 import java.io.FileFilter
@@ -40,12 +39,14 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
     lateinit var fileRegex: Regex
     var currentPath = ""
     var spinnerInited = false
+    var maxItems = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_picker)
 
         val mediaType = intent.getIntExtra("media_type", 0)
+        maxItems = intent.getIntExtra("max_items", 1)
         applyMediaType(mediaType)
 
         checkPermission()
@@ -111,8 +112,25 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
             levels.push(currentPath)
             getDirContent(fpItems[position].path)
         } else {
-            setResult(Activity.RESULT_OK, Intent().putExtra("file_path", fpItems[position].path))
-            finish()
+            if (isAllowToPickMore() or fpItems[position].selected) {
+                fpItems[position].selected = !fpItems[position].selected
+                recyclerView.adapter.notifyItemChanged(position)
+                checkSelectedItems()
+            } else {
+                Toast.makeText(this, "You can't pick mor than $maxItems", Toast.LENGTH_SHORT).show()
+            }
+        }
+//        setResult(Activity.RESULT_OK, Intent().putExtra("file_path", fpItems[position].path))
+//        finish()
+    }
+
+    private fun isAllowToPickMore() = fpItems.filter { it.selected }.size < maxItems
+
+    private fun checkSelectedItems() {
+        if (fpItems.filter { it.selected }.isEmpty()) {
+            selectBtn.visibility = View.GONE
+        } else {
+            selectBtn.visibility = View.VISIBLE
         }
     }
 

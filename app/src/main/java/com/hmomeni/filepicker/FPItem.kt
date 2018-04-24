@@ -4,5 +4,6 @@ data class FPItem(
         val path: String,
         val type: Int,
         val title: String,
-        val childCount: Int
+        val childCount: Int,
+        var selected: Boolean = false
 )

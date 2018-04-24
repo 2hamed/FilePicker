@@ -10,5 +10,10 @@ class FPFileHolder(private val context: Context, itemView: View, fpItemClickCall
     override fun bindView(fpItem: FPItem) {
         itemView.titleV.text = fpItem.title
         GlideApp.with(context).load(File(fpItem.path)).into(itemView.previewV)
+        if (fpItem.selected) {
+            itemView.checkImg.visibility = View.VISIBLE
+        } else {
+            itemView.checkImg.visibility = View.GONE
+        }
     }
 }

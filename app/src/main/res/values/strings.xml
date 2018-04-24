@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">FilePicker</string>
+    <string-array name="media_types">
+        <item>Photos</item>
+        <item>Videos</item>
+        <item>Audios</item>
+        <item>Files</item>
+    </string-array>
 </resources>

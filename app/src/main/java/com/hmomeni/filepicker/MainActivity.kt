@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -13,17 +14,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         browseBtn.setOnClickListener {
-            startActivityForResult(Intent(this, FilePickerActivity::class.java).putExtra("max_items", 3), 1234)
+            FilePickerActivity.start(this)
         }
 
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            1234 -> {
-                if (resultCode == Activity.RESULT_OK) {
-
-                }
+        when {
+            requestCode == FilePickerActivity.FILE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK -> {
+                val items = FilePickerActivity.parse(data!!)
+                Toast.makeText(this, "${items.size} items was selected!", Toast.LENGTH_SHORT).show()
             }
         }
     }

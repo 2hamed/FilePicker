@@ -60,7 +60,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         typeSpinner.onItemSelectedListener = this
 
         selectBtn.setOnClickListener {
-            setResult(Activity.RESULT_OK, Intent().putStringArrayListExtra("file_paths", ArrayList(fpItems.filter { it.selected }.map { it.path })))
+            setResult(Activity.RESULT_OK, Intent().putStringArrayListExtra("files", ArrayList(fpItems.filter { it.selected }.map { it.path })))
             finish()
         }
     }
@@ -89,8 +89,8 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
 
         fpItems.clear()
         val dir = File(path)
-        for (node in dir.listFiles(FileFilter { it.isDirectory or it.extension.matches(fileRegex) })) {
-            val childCount = if (node.isDirectory) node.listFiles(FileFilter { it.isDirectory or it.extension.matches(fileRegex) }).size else 0
+        for (node in dir.listFiles(FileFilter { (it.isDirectory && !it.name.startsWith('.')) or it.extension.matches(fileRegex) })) {
+            val childCount = if (node.isDirectory) node.listFiles(FileFilter { (it.isDirectory && !it.name.startsWith('.')) or it.extension.matches(fileRegex) }).size else 0
             if (!node.isDirectory || childCount != 0) {
                 fpItems.add(FPItem(
                         node.absolutePath,
@@ -175,6 +175,25 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
                     finish()
                 }
             }
+        }
+    }
+
+    companion object {
+        const val FILE_PICKER_REQUEST_CODE = 4543
+
+        enum class MediaType {
+            PHOTO, VIDEO, AUDIO, FILE
+        }
+
+        fun start(activity: Activity, fileCount: Int = 1, mediaType: MediaType = MediaType.PHOTO) {
+            val intent = Intent(activity, FilePickerActivity::class.java)
+                    .putExtra("file_count", fileCount)
+                    .putExtra("media_type", mediaType)
+            activity.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE)
+        }
+
+        fun parse(data: Intent): List<String> {
+            return data.getStringArrayListExtra("files")
         }
     }
 }

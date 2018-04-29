@@ -28,13 +28,21 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         if (spinnerInited) {
-            applyMediaType(position)
+            when (position) {
+                0 -> applyMediaType(MediaType.PHOTO)
+                1 -> applyMediaType(MediaType.VIDEO)
+                2 -> applyMediaType(MediaType.AUDIO)
+                3 -> applyMediaType(MediaType.FILE)
+            }
             initPicker()
         } else {
             spinnerInited = true
         }
     }
 
+    enum class MediaType {
+        PHOTO, VIDEO, AUDIO, FILE
+    }
 
     val MY_WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST = 6823
     val fpItems = mutableListOf<FPItem>()
@@ -48,12 +56,29 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_picker)
 
-        val mediaType = intent.getIntExtra("media_type", 0)
+        initViews()
+
+        val allowMultiType = intent.getBooleanExtra("multi_type", false)
+
+        if (!allowMultiType) {
+            typeSpinner.isEnabled = false
+        }
+
+        val mediaType = intent.getSerializableExtra("media_type") as MediaType
         maxItems = intent.getIntExtra("max_items", 1)
         applyMediaType(mediaType)
 
-        checkPermission()
+        when (mediaType) {
+            MediaType.PHOTO -> typeSpinner.setSelection(0)
+            MediaType.VIDEO -> typeSpinner.setSelection(1)
+            MediaType.AUDIO -> typeSpinner.setSelection(2)
+            MediaType.FILE -> typeSpinner.setSelection(3)
+        }
 
+        checkPermission()
+    }
+
+    fun initViews() {
         typeSpinner.adapter = ArrayAdapter.createFromResource(this, R.array.media_types, android.R.layout.simple_spinner_item).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
@@ -65,16 +90,16 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         }
     }
 
-    fun applyMediaType(mediaType: Int) {
+    fun applyMediaType(mediaType: MediaType) {
         when (mediaType) {
         //photos
-            0 -> fileRegex = Pattern.compile("^(png|jpe?g|gif)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.PHOTO -> fileRegex = Pattern.compile("^(png|jpe?g|gif)$", Pattern.CASE_INSENSITIVE).toRegex()
         //videos
-            1 -> fileRegex = Pattern.compile("^(mp4|mpe?g|3gp)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.VIDEO -> fileRegex = Pattern.compile("^(mp4|mpe?g|3gp)$", Pattern.CASE_INSENSITIVE).toRegex()
         //audios
-            2 -> fileRegex = Pattern.compile("^(mp3)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.AUDIO -> fileRegex = Pattern.compile("^(mp3)$", Pattern.CASE_INSENSITIVE).toRegex()
         //all
-            3 -> fileRegex = Pattern.compile("^(.*)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.FILE -> fileRegex = Pattern.compile("^(.*)$", Pattern.CASE_INSENSITIVE).toRegex()
         }
 
     }
@@ -95,7 +120,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
                 fpItems.add(FPItem(
                         node.absolutePath,
                         if (node.isDirectory) 1 else 0,
-                        node.name,
+                        if (node.name.length < 15) node.name else node.name.take(10) + "(...)." + node.extension,
                         childCount)
                 )
             }
@@ -125,7 +150,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
                 recyclerView.adapter.notifyItemChanged(position)
                 checkSelectedItems()
             } else {
-                Toast.makeText(this, "You can't pick mor than $maxItems", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You can't pick more than $maxItems items", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -181,14 +206,11 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
     companion object {
         const val FILE_PICKER_REQUEST_CODE = 4543
 
-        enum class MediaType {
-            PHOTO, VIDEO, AUDIO, FILE
-        }
-
-        fun start(activity: Activity, fileCount: Int = 1, mediaType: MediaType = MediaType.PHOTO) {
+        fun start(activity: Activity, maxItems: Int = 1, mediaType: MediaType = MediaType.PHOTO, allowMultiType: Boolean = false) {
             val intent = Intent(activity, FilePickerActivity::class.java)
-                    .putExtra("file_count", fileCount)
+                    .putExtra("max_items", maxItems)
                     .putExtra("media_type", mediaType)
+                    .putExtra("multi_type", allowMultiType)
             activity.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE)
         }
 

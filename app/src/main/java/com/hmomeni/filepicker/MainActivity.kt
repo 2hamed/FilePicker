@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         browseBtn.setOnClickListener {
-            FilePickerActivity.start(this)
+            FilePickerActivity.start(this, maxItems = 5, mediaType = FilePickerActivity.MediaType.VIDEO, allowMultiType = true)
         }
 
     }

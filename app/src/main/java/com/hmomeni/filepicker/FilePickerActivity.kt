@@ -44,13 +44,15 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         PHOTO, VIDEO, AUDIO, FILE
     }
 
-    val MY_WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST = 6823
-    val fpItems = mutableListOf<FPItem>()
-    val levels = Stack<String>()
-    lateinit var fileRegex: Regex
-    var currentPath = ""
-    var spinnerInited = false
-    var maxItems = 1
+    @Suppress("PrivatePropertyName")
+    private val MY_WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST = 6823
+    private val fpItems = mutableListOf<FPItem>()
+    private val levels = Stack<String>()
+    private lateinit var fileRegex: Regex
+    private var currentPath = ""
+    private var spinnerInited = false
+    private var maxItems = 1
+    private var withCamera = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +65,8 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         if (!allowMultiType) {
             typeSpinner.isEnabled = false
         }
+
+        withCamera = intent.getBooleanExtra("with_camera", false)
 
         val mediaType = intent.getSerializableExtra("media_type") as MediaType
         maxItems = intent.getIntExtra("max_items", 1)
@@ -78,7 +82,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         checkPermission()
     }
 
-    fun initViews() {
+    private fun initViews() {
         typeSpinner.adapter = ArrayAdapter.createFromResource(this, R.array.media_types, android.R.layout.simple_spinner_item).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
@@ -90,16 +94,16 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
         }
     }
 
-    fun applyMediaType(mediaType: MediaType) {
-        when (mediaType) {
+    private fun applyMediaType(mediaType: MediaType) {
+        fileRegex = when (mediaType) {
         //photos
-            MediaType.PHOTO -> fileRegex = Pattern.compile("^(png|jpe?g|gif)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.PHOTO -> Pattern.compile("^(png|jpe?g|gif)$", Pattern.CASE_INSENSITIVE).toRegex()
         //videos
-            MediaType.VIDEO -> fileRegex = Pattern.compile("^(mp4|mpe?g|3gp)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.VIDEO -> Pattern.compile("^(mp4|mpe?g|3gp)$", Pattern.CASE_INSENSITIVE).toRegex()
         //audios
-            MediaType.AUDIO -> fileRegex = Pattern.compile("^(mp3)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.AUDIO -> Pattern.compile("^(mp3)$", Pattern.CASE_INSENSITIVE).toRegex()
         //all
-            MediaType.FILE -> fileRegex = Pattern.compile("^(.*)$", Pattern.CASE_INSENSITIVE).toRegex()
+            MediaType.FILE -> Pattern.compile("^(.*)$", Pattern.CASE_INSENSITIVE).toRegex()
         }
 
     }
@@ -124,7 +128,9 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
                         childCount)
                 )
             }
-
+        }
+        if (withCamera && levels.size == 0) {
+            fpItems.add(0, FPItem("", 2, "", 0))
         }
 
         populateRecyclerView()
@@ -141,6 +147,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
     }
 
     override fun onItemClicked(position: Int) {
+
         if (fpItems[position].type == 1) {
             levels.push(currentPath)
             getDirContent(fpItems[position].path)
@@ -159,7 +166,7 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
     private fun isAllowToPickMore() = fpItems.filter { it.selected }.size < maxItems
 
     private fun checkSelectedItems() {
-        if (fpItems.filter { it.selected }.isEmpty()) {
+        if (fpItems.none { it.selected }) {
             selectBtn.visibility = View.GONE
         } else {
             selectBtn.visibility = View.VISIBLE
@@ -176,14 +183,19 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
 
     private fun checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            when {
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
 
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), MY_WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST)
+                }
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.CAMERA) -> {
 
+                }
+                else -> ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), MY_WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST)
             }
 
         } else {
@@ -206,11 +218,12 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
     companion object {
         const val FILE_PICKER_REQUEST_CODE = 4543
 
-        fun start(activity: Activity, maxItems: Int = 1, mediaType: MediaType = MediaType.PHOTO, allowMultiType: Boolean = false) {
+        fun start(activity: Activity, maxItems: Int = 1, mediaType: MediaType = MediaType.PHOTO, allowMultiType: Boolean = false, withCamera: Boolean = false) {
             val intent = Intent(activity, FilePickerActivity::class.java)
                     .putExtra("max_items", maxItems)
                     .putExtra("media_type", mediaType)
                     .putExtra("multi_type", allowMultiType)
+                    .putExtra("with_camera", withCamera)
             activity.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE)
         }
 

@@ -148,11 +148,16 @@ class FilePickerActivity : AppCompatActivity(), FPItemClickCallback, AdapterView
 
     override fun onItemClicked(position: Int) {
 
-        if (fpItems[position].type == 1) {
-            levels.push(currentPath)
-            getDirContent(fpItems[position].path)
-        } else {
-            if (isAllowToPickMore() or fpItems[position].selected) {
+
+        when {
+            fpItems[position].type == 1 -> {
+                levels.push(currentPath)
+                getDirContent(fpItems[position].path)
+            }
+            fpItems[position].type == 2 -> {
+                startActivity(Intent(this, CameraActivity::class.java))
+            }
+            else -> if (isAllowToPickMore() or fpItems[position].selected) {
                 fpItems[position].selected = !fpItems[position].selected
                 recyclerView.adapter.notifyItemChanged(position)
                 checkSelectedItems()

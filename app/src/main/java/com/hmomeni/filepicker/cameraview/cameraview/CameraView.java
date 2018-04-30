@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class CameraView extends FrameLayout {
-
+    private boolean isAlreadyStarted = false;
     /**
      * The camera device faces the opposite direction as the device's screen.
      */
@@ -263,6 +263,10 @@ public class CameraView extends FrameLayout {
      * {@link Activity#onResume()}.
      */
     public void start() {
+        if (isAlreadyStarted) {
+            return;
+        }
+        isAlreadyStarted = true;
         if (!mImpl.start()) {
             //store the state ,and restore this state after fall back o Camera1
             Parcelable state = onSaveInstanceState();
@@ -278,6 +282,7 @@ public class CameraView extends FrameLayout {
      * {@link Activity#onPause()}.
      */
     public void stop() {
+        isAlreadyStarted = false;
         mImpl.stop();
     }
 

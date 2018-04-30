@@ -29,4 +29,9 @@ class CameraHolder(context: Context, itemView: View, fpItemClickCallback: FPItem
     fun onStop() {
         itemView.cameraView.stop()
     }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onStart() {
+        itemView.cameraView.start()
+    }
 }

@@ -1,10 +1,14 @@
 package com.hmomeni.filepicker
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.support.media.ExifInterface
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.hmomeni.filepicker.cameraview.cameraview.CameraView
 import kotlinx.android.synthetic.main.activity_camera.*
+import java.io.ByteArrayInputStream
 
 class CameraActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -14,16 +18,17 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_camera)
 
         cameraView.addCallback(object : CameraView.Callback() {
-            override fun onCameraOpened(cameraView: CameraView?) {
-                super.onCameraOpened(cameraView)
-            }
+            override fun onPictureTaken(cameraView: CameraView, data: ByteArray) {
+                val imageBitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+                cropImageView.setImageBitmap(imageBitmap, ExifInterface(ByteArrayInputStream(data)))
+                cropImageView.visibility = View.VISIBLE
+                cameraView.visibility = View.GONE
 
-            override fun onCameraClosed(cameraView: CameraView?) {
-                super.onCameraClosed(cameraView)
-            }
+                Handler().postDelayed({ cameraView.stop() }, 500)
 
-            override fun onPictureTaken(cameraView: CameraView?, data: ByteArray?) {
-                super.onPictureTaken(cameraView, data)
+                captureBtn.animate().translationYBy(300f).duration = 500
+                switchCameraBtn.animate().translationYBy(300f).duration = 500
+                flashBtn.animate().translationYBy(300f).duration = 500
             }
         })
 

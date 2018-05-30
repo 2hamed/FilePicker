@@ -17,6 +17,16 @@
 
     </com.hmomeni.filepicker.cameraview.cameraview.CameraView>
 
+    <com.hmomeni.filepicker.cropper.CropImageView
+        android:id="@+id/cropImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <View
         android:id="@+id/flashView"
         android:layout_width="0dp"
@@ -32,14 +42,12 @@
         android:id="@+id/flashBtn"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/captureBtn"
         app:layout_constraintEnd_toStartOf="@+id/captureBtn"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/captureBtn"
         app:srcCompat="@drawable/ic_flash" />
 
     <com.hmomeni.filepicker.CameraButton
@@ -47,10 +55,6 @@
         android:layout_width="66dp"
         android:layout_height="64dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:text="Capture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/switchCameraBtn"
@@ -60,13 +64,11 @@
         android:id="@+id/switchCameraBtn"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/captureBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/captureBtn"
+        app:layout_constraintTop_toTopOf="@+id/captureBtn"
         app:srcCompat="@drawable/ic_camera_front" />
 
 

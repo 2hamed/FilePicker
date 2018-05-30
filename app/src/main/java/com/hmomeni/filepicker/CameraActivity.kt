@@ -54,7 +54,13 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.captureBtn -> {
                 cameraView.takePicture()
+                flash()
             }
         }
+    }
+
+    private fun flash() {
+        flashView.alpha = 1f
+        flashView.animate().alpha(0f).duration = 500
     }
 }

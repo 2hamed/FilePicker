@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <item android:gravity="center">
+        <bitmap
+            android:src="@drawable/bg_camera_btn_outer_circle"
+            android:gravity="center"></bitmap>
+    </item>
+    <item
+        android:drawable="@drawable/bg_camera_btn_inner_circle"
+        android:gravity="center">
+        <shape>
+            <size
+                android:width="48dp"
+                android:height="48dp" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_camera"
+        android:gravity="center">
+        <shape>
+            <size
+                android:width="36dp"
+                android:height="36dp" />
+        </shape>
+    </item>
+</layer-list>

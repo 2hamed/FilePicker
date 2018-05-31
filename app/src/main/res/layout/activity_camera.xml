@@ -6,16 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".CameraActivity">
 
-    <com.hmomeni.filepicker.cameraview.cameraview.CameraView
+    <io.fotoapparat.view.CameraView
         android:id="@+id/cameraView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </com.hmomeni.filepicker.cameraview.cameraview.CameraView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.hmomeni.filepicker.cropper.CropImageView
         android:id="@+id/cropImageView"
@@ -48,7 +46,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/captureBtn"
-        app:srcCompat="@drawable/ic_flash" />
+        app:srcCompat="@drawable/ic_flash_auto" />
 
     <com.hmomeni.filepicker.CameraButton
         android:id="@+id/captureBtn"

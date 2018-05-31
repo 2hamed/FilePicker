@@ -33,6 +33,9 @@ dependencies {
     implementation "com.android.support:exifinterface:27.1.1"
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
+    implementation 'io.fotoapparat.fotoapparat:library:2.2.0'
+
+
     implementation "android.arch.lifecycle:extensions:1.1.1"
     kapt "android.arch.lifecycle:compiler:1.1.1"
 
@@ -43,6 +46,6 @@ dependencies {
 
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
